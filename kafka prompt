@@ -1,0 +1,41 @@
+I have a test script for a Kafka-based K Streams jurisdiction filtering component. I need you to analyze this code and extract the following information in a structured format:
+1. Kafka Configuration
+
+Bootstrap server addresses and how they are configured
+Authentication method (SSL, SASL, plaintext etc.)
+Any consumer group IDs used
+All Kafka topic names referenced (input topics, output topics)
+
+2. Payload Structure
+
+The full JSON/Avro schema of the message payload being produced to Kafka
+All field names and their data types
+Which fields determine compliance vs non-compliance (the jurisdiction logic fields)
+Any headers being set on the Kafka messages
+
+3. Jurisdiction Business Rules
+
+What conditions make a transaction cloud-compliant vs non-compliant
+Which output topic does compliant data go to
+Which output topic does non-compliant data go to
+
+4. OpenShift / Infrastructure
+
+Namespace names used
+Pod or deployment names referenced
+How the K Streams app is accessed or health-checked
+Any port-forwarding or service names
+
+5. Libraries and Client Details
+
+Which Kafka Python client library is used and its version
+Which Kubernetes/OpenShift client is used (kubernetes SDK, oc CLI, etc.)
+Any other notable imports or dependencies
+
+6. Test Patterns Already Used
+
+How does the test produce messages and then consume/assert the result
+How long does it wait for messages to appear
+Any correlation ID or tracing mechanism used
+
+Please return this as a clean structured document. Do not summarize — be exhaustive and specific, including exact field names, topic names, and values where present.
