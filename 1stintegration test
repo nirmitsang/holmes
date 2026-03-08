@@ -1,0 +1,69 @@
+No problem. Here are the exact commands to run manually in your terminal on the office laptop. No Antigravity needed — just copy-paste each one directly.
+
+---
+
+## Pre-Flight Checks (run in order, from project root)
+
+**Check 1 — .env keys present:**
+```bash
+python -c "
+from dotenv import dotenv_values
+config = dotenv_values('.env')
+required = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY', 'AWS_REGION']
+for key in required:
+    status = 'PRESENT' if key in config and config[key] else 'MISSING OR EMPTY'
+    print(f'{key}: {status}')
+"
+```
+
+**Check 2 — settings.py loads:**
+```bash
+python -c "from settings import settings; print('settings loaded OK'); print(f'Region: {settings.aws_region}')"
+```
+
+**Check 3 — Minimal live Bedrock call:**
+```bash
+python -c "
+import boto3, json
+from dotenv import load_dotenv
+import os
+load_dotenv()
+client = boto3.client(
+    'bedrock-runtime',
+    region_name=os.getenv('AWS_REGION'),
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+)
+body = json.dumps({
+    'anthropic_version': 'bedrock-2023-05-31',
+    'max_tokens': 500,
+    'temperature': 1,
+    'thinking': {'type': 'enabled', 'budget_tokens': 200},
+    'messages': [{'role': 'user', 'content': 'Reply with the single word: ONLINE'}],
+})
+response = client.invoke_model(
+    modelId='us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+    body=body,
+)
+parsed = json.loads(response['Body'].read())
+text = next(b['text'] for b in parsed['content'] if b['type'] == 'text')
+print(f'Bedrock response: {text}')
+print('CREDENTIALS AND NETWORK: OK')
+"
+```
+
+---
+
+## If All Three Pass — Run the Test Suite
+
+```bash
+python -m pytest tests/integration/test_e2e_phase1.py -v -s
+```
+
+The `-s` flag is important — it lets stdout from the nodes (including the `_validate_test_cases` warnings) print live so you can watch the pipeline progress in real time.
+
+---
+
+## What To Paste Back Here
+
+Just paste the terminal output from the test run. Even a partial run or a failure mid-suite is useful — the error trace will tell us exactly where to focus. Expected runtime is 3–6 minutes given the Bedrock calls with extended thinking enabled.
