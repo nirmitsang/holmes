@@ -1,0 +1,30 @@
+This is the perfect next step. Now that your Streamlit UI is running, you need to test the two distinct paths of your pipeline: the "Happy Path" (where the AI has everything it needs) and the "Human-in-the-Loop Path" (where the AI forces an interrupt to ask you questions).
+
+Here are two mock Release Requirements you can copy and paste directly into your new UI.
+
+### Option 1: The "Happy Path" (High Confidence)
+
+*Use this to watch the pipeline seamlessly flow from Stage 1 all the way to Gate #1 without stopping.*
+
+Copy and paste this exact text:
+
+> "The OMNI Jurisdiction K Streams job must be updated to reflect new compliance routing rules. The job consumes messages from the Kafka topic 'omni.jurisdiction.k.raw.events'. Each message payload contains the following fields: jurisdiction_code (string), transaction_amount (float), account_status (string, values: ACTIVE, SUSPENDED, CLOSED), and kyc_verified (boolean). Routing rules: if jurisdiction_code is exactly 'K' AND transaction_amount is greater than 0.0 AND account_status is 'ACTIVE' AND kyc_verified is true, route to 'omni.jurisdiction.k.compliant.events'. All other conditions route to 'omni.jurisdiction.k.noncompliant.events'. Edge cases: transaction_amount of exactly 0.0 is non-compliant. A missing kyc_verified field is non-compliant. A jurisdiction_code of 'k' (lowercase) is non-compliant. A null account_status is non-compliant."
+
+**What to expect:** Because this contains all 6 mandatory items from our rubric (topics, schema, rules, edge cases), the QA Interaction Agent should score it > 0.85, skip the interrupt, and hand it straight to the Spec Generator.
+
+---
+
+### Option 2: The "Human-in-the-Loop" Test (Low Confidence)
+
+*Use this to test the Streamlit interrupt handler we just built in Part 1. This is where the magic happens.*
+
+Copy and paste this vague text:
+
+> "We are onboarding the new EU Payments team to OMNI. Please update the Jurisdiction K Streams job so that their transactions are routed correctly to the compliant or non-compliant topics based on their data residency flags. Standard cloud compliance rules apply."
+
+**What to expect:** 1. The pipeline will start running.
+2. The QA Interaction Agent will realize it is missing the exact Kafka topic names, the payload schema, and the specific field conditions.
+3. It will score its confidence very low and trigger a `GraphInterrupt`.
+4. Your Streamlit UI should catch this, pause the spinner, and dynamically render a text box asking you questions like, *"What are the exact Kafka topic names?"* and *"What is the payload schema?"*
+
+Drop one of these into your app and hit **Run Pipeline**. Let me know how the UI handles it!
