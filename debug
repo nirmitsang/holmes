@@ -1,0 +1,22 @@
+python -c "
+from src.graph.builder import build_graph
+from src.state.state import default_state
+
+graph = build_graph()
+config = {'configurable': {'thread_id': 'diag-001'}}
+state = default_state('Test requirement for diagnostic purposes only.')
+
+try:
+    result = graph.invoke(state, config=config)
+    print('invoke() RETURNED NORMALLY')
+    print(f'Type: {type(result)}')
+    print(f'current_stage: {result.get(\"current_stage\")}')
+    print(f'interrupt_payload: {result.get(\"interrupt_payload\")}')
+    snapshot = graph.get_state(config)
+    print(f'snapshot.next: {snapshot.next}')
+except Exception as e:
+    print(f'invoke() RAISED: {type(e).__name__}')
+    print(f'Message: {e}')
+    snapshot = graph.get_state(config)
+    print(f'snapshot.next: {snapshot.next}')
+"
